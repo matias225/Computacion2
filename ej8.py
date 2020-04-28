@@ -16,8 +16,13 @@ def getProcess(opts):
         if opt == '-p' or opt == "--process":
             if arg.isdigit():
                 process = arg
-                print(process)
+                return process
             else:
                 print('Wrong Argument: "'+str(arg)+'" is not a digit.')
+                exit()
 
-getProcess(getArg())
+def forking(numProcess):
+    print("Forkeando "+str(numProcess)+' procesos')
+
+numProcess = getProcess(getArg())
+forking(numProcess)
