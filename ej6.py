@@ -1,16 +1,26 @@
 #!/usr/bin/python3
 
 import time
-from os import fork
-from signal import signal, SIGUSR1, getsignal
+from os import fork, wait, kill, getpid
+from signal import pause, signal, SIGUSR1, SIGTERM, getsignal
 
 def funcUSR1(s, frame):
-    pass
+    print("Señal USR1 recibida")
+    exit()
+
+def son():
+    while True:
+        print("Hijo esperando")
+        pause()
 
 def main():
     signal(SIGUSR1, funcUSR1)
-    if fork():
-        print("Soy el hijo")
+    pid = fork()
+    print(pid)
+    if pid:
+        print("Soy el hijo "+str(pid))
+        son()
+        #kill(pid, SIGTERM)
         
 if __name__ == '__main__':
     main()
