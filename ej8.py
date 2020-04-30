@@ -11,6 +11,7 @@ def funcUSR2(s, frame):
     print("Soy el PID "+str(getpid())+", recibí la señal "+str(s)+" de mi padre PID "+str(getppid())+"\n")
     exit()
 
+
 def getArg():
     try:
         (opts, arg) = getopt(sys.argv[1:], 'p:', ["process="])
@@ -51,7 +52,11 @@ def forking(numProcess):
 
 def main():
     numProcess = getProcess(getArg())
-    forking(numProcess)
+    if numProcess:
+        forking(numProcess)
+    else:
+        print('Please use -p or --process with an argument...')
+        exit()
 
 
 if __name__ == "__main__":
