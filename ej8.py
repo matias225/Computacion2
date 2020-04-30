@@ -8,8 +8,8 @@ from signal import signal, SIGUSR2, SIGKILL, pause
 
 
 def funcUSR2(s, frame):
-    print("Soy el PID "+str(getpid())+", recibí la señal "+str(s)+" de mi padre PID "+str(getppid()))
-
+    print("Soy el PID "+str(getpid())+", recibí la señal "+str(s)+" de mi padre PID "+str(getppid())+"\n")
+    exit()
 
 def getArg():
     try:
@@ -21,16 +21,15 @@ def getArg():
 
 
 def son():
-    while True:
-        print("Hijo esperando...")
-        pause()
+    print("Hijo esperando...")
+    pause()
 
 
 def getProcess(opts):
     for (opt, arg) in opts:
         if opt == '-p' or opt == "--process":
             if arg.isdigit():
-                process = arg
+                process = int(arg)
                 return process
             else:
                 print('Wrong Argument: "'+str(arg)+'" is not a digit.')
@@ -39,24 +38,20 @@ def getProcess(opts):
 
 def forking(numProcess):
     signal(SIGUSR2, funcUSR2)
-    pid = fork()
-    if pid:
-        print("Padre PID: "+str(getpid()))
-        print("Creando proceso: "+str(pid))
-        time.sleep(3)
-        kill(pid, SIGUSR2)
-        time.sleep(3)
-        print("Padre matando hijo "+str(pid))
-        kill(pid, SIGKILL)
-    else:
-        son()
-
-#numProcess = getProcess(getArg())
-#forking(numProcess)
+    for a in range(numProcess):
+        pid = fork()
+        if pid:
+            print("Padre PID: "+str(getpid())+". \nCreando proceso hijo: "+str(pid))
+            time.sleep(1)
+            kill(pid, SIGUSR2)
+            time.sleep(2)
+        else:
+            son()
 
 
 def main():
-    forking(1)
+    numProcess = getProcess(getArg())
+    forking(numProcess)
 
 
 if __name__ == "__main__":
