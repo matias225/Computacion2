@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-from os import fork
-
 def main():
     pass
 
