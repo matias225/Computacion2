@@ -49,6 +49,9 @@ def createSocket(port, protocol):
         while True:
             data = clientsocket.recv(1024)
             print("Address: %s " % str(addr))
+            print("Recibido: "+data.decode("ascii"))
+            msg = input('Enter message to send : ')
+            clientsocket.send(msg.encode('ascii'))
     elif prot == 'udp':
         print('Protocolo UPD')
     else:

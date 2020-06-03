@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
 import socket
+import getopt
 from sys import argv, exit
 
 def getOptions():
     try:
-        (opts, arg) = getopt.getopt(sys.argv[1:], 'a:t:p:', [])
+        (opts, arg) = getopt.getopt(argv[1:], 'a:t:p:', [])
         return opts
     except getopt.GetoptError as error:
         print('Wrong Option: '+str(error))
@@ -27,3 +28,11 @@ except socket.error:
     exit()
 
 s.connect((host, port))
+
+while(True) :
+    msg = input('Enter message to send : ')
+    #Set the whole string
+    s.send(msg.encode('ascii'))
+    # receive data from client (data, addr)
+    msg = s.recv(1024)
+    print('Server reply : ' + msg.decode("ascii"))
