@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import socket
 from sys import argv, exit
 
@@ -7,8 +9,8 @@ except socket.error:
     print("Failed to create socket")
     exit()
 
-host = socket.gethostname()
-port = int(argv[1])
+host = argv[1]
+port = int(argv[2])
 
 s.connect((host, port))
 
