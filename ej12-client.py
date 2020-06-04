@@ -2,7 +2,7 @@
 
 import socket
 import getopt
-from sys import argv, exit
+from sys import argv, exit, stdin
 
 
 def getOptions():
@@ -31,8 +31,9 @@ except socket.error:
 
 s.connect((host, port))
 
-while(True) :
-    msg = input('Enter message to send: ')
-    s.send(msg.encode('ascii'))
-    msg = s.recv(1024)
-    print('Server reply : ' + msg.decode("ascii"))
+while True:
+    try:
+        msg = input("Enter message to send: ")
+        s.send(msg.encode('ascii'))        
+    except EOFError:
+        break

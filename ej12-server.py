@@ -26,19 +26,13 @@ for (opts, arg) in options:
 
 print(port)
 print(protocol)
-print(pathfile)
+print(pathfile)    
 
 
-def createFile(pathfile):
-    file = pathfile
-    if not os.path.exists(file):
-        f = open(file, "w")
-    return
-
-
-def createSocket(port, protocol):
+def createSocket(port, protocol, pathfile):
     port = port
     prot = protocol
+    file = pathfile
     if prot == 'tcp':
         print('Protocolo TCP')
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -48,19 +42,20 @@ def createSocket(port, protocol):
         print('Server waiting for clients...')
         clientsocket, addr = serversocket.accept()
         while True:
+            f = open(file, "a")
             data = clientsocket.recv(1024)
+            if data.decode('ascii') == 'exit':
+                clientsocket.send('exit'.encode('ascii'))
+                serversocket.close()
+                f.close()
+                break
             print("Address: %s " % str(addr))
             print("Recibido: "+data.decode("ascii"))
-            msg = input('Enter message to send : ')
-            clientsocket.send(msg.encode('ascii'))
+            f.write(data.decode("ascii")+'\n')    
     elif prot == 'udp':
         print('Protocolo UPD')
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
     else:
         print('Protocolo ingresado no válido')
 
-
-createFile(pathfile)
-createSocket(port, protocol)
-# Ejemplo
-# createFile('/tmp/temp.txt')
+createSocket(port, protocol, pathfile) 
