@@ -1,25 +1,28 @@
 #!/usr/bin/python3
 
+import os
 import socket
+import sys
 import getopt
-from sys import argv, exit
+
 
 def getOptions():
     try:
-        (opts, arg) = getopt.getopt(argv[1:], 'a:t:p:', [])
+        (opts, arg) = getopt.getopt(sys.argv[1:], 'l:', [])
         return opts
     except getopt.GetoptError as error:
         print('Wrong Option: '+str(error))
         exit()
 
+
 options = getOptions()
 for (opts, arg) in options:
-    if opts == '-p':
-        port = int(arg)
-    if opts == '-t':
-        protocol = arg
-    if opts == '-a':
-        host = arg
+    if opts == '-l':
+        log = arg
+
+
+host = ""
+port = 8200
 
 try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -29,10 +32,13 @@ except socket.error:
 
 s.connect((host, port))
 
-while(True) :
-    msg = input('Enter message to send: ')
-    #Set the whole string
+while True:
+    msg = input('> ')
     s.send(msg.encode('ascii'))
-    # receive data from client (data, addr)
-    msg = s.recv(1024)
-    print('Server reply : ' + msg.decode("ascii"))
+    msg = s.recv(2048)
+    if msg.decode('ascii') == 'exit':
+        s.close()
+        print('Cerrando conexión...')
+        break
+    else:
+        print(msg.decode('ascii'))

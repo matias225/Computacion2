@@ -45,6 +45,7 @@ def createSocket(port, protocol):
         host = ""
         serversocket.bind((host, port))
         serversocket.listen(5)
+        print('Server waiting for clients...')
         clientsocket, addr = serversocket.accept()
         while True:
             data = clientsocket.recv(1024)
