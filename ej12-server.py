@@ -55,6 +55,7 @@ def createSocket(port, protocol):
             clientsocket.send(msg.encode('ascii'))
     elif prot == 'udp':
         print('Protocolo UPD')
+        serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
     else:
         print('Protocolo ingresado no válido')
 

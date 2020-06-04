@@ -3,6 +3,7 @@
 import os
 import socket
 import sys
+import datetime
 import getopt
 
 
@@ -18,8 +19,7 @@ def getOptions():
 options = getOptions()
 for (opts, arg) in options:
     if opts == '-l':
-        log = arg
-
+        logfile = arg
 
 host = ""
 port = 8200
@@ -33,12 +33,18 @@ except socket.error:
 s.connect((host, port))
 
 while True:
-    msg = input('> ')
-    s.send(msg.encode('ascii'))
+    msgsend = input('> ')
+    s.send(msgsend.encode('ascii'))
     msg = s.recv(2048)
     if msg.decode('ascii') == 'exit':
+        l = open(logfile, 'a')
+        l.write(str(datetime.datetime.now())+"   "+str(msgsend)+"\n")
+        l.close()
         s.close()
         print('Cerrando conexión...')
         break
     else:
+        l = open(logfile, 'a')
+        l.write(str(datetime.datetime.now())+"   "+str(msgsend)+"\n")
         print(msg.decode('ascii'))
+        l.close()
