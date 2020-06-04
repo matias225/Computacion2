@@ -24,10 +24,6 @@ for (opts, arg) in options:
     if opts == '-f':
         pathfile = arg
 
-print(port)
-print(protocol)
-print(pathfile)    
-
 
 def createSocket(port, protocol, pathfile):
     port = port
@@ -44,17 +40,30 @@ def createSocket(port, protocol, pathfile):
         while True:
             f = open(file, "a")
             data = clientsocket.recv(1024)
+            f.write(data.decode("ascii")+'\n')    
+            print("Address: %s " % str(addr))
+            print("Recibido: "+data.decode("ascii"))
             if data.decode('ascii') == 'exit':
-                clientsocket.send('exit'.encode('ascii'))
                 serversocket.close()
                 f.close()
                 break
-            print("Address: %s " % str(addr))
-            print("Recibido: "+data.decode("ascii"))
-            f.write(data.decode("ascii")+'\n')    
     elif prot == 'udp':
         print('Protocolo UPD')
         serversocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+        host = ""
+        serversocket.bind((host, port))
+        while True:
+            f = open(file, "a")
+            data, addr = serversocket.recvfrom(1024)
+            f.write(data.decode("ascii")+'\n')    
+            address = addr[0]
+            port = addr[1]
+            print("Address: %s - Port %d" % (address, port))
+            print("Recibido: "+data.decode("ascii"))
+            if data.decode('ascii') == 'exit':
+                serversocket.close()
+                f.close()
+                break
     else:
         print('Protocolo ingresado no válido')
 
