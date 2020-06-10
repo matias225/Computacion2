@@ -22,7 +22,7 @@ for (opts, arg) in options:
         logfile = arg
 
 host = ""
-port = 8200
+port = 8000
 
 try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
