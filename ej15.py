@@ -1,18 +1,21 @@
 #!/usr/bin/python3
 
 import multiprocessing as mp
+import sys
 
 
 def child(r,w,n):
     print("Hijo ", n)
-    if n == 1:
-        r.close() 
-        msg = input()
-        print("Hijo envia: "+msg)
-        w.send(msg)
-    if n == 2:
-        w.close()
-        print("Hijo recibe: "+r.recv())
+    while True:
+        if n == 1:
+            sys.stdin = open(0)
+            r.close() 
+            msg = input()
+            print("Hijo envia: "+msg)
+            w.send(msg)
+        if n == 2:
+            w.close()
+            print("Hijo recibe: "+r.recv())
     r.close()
     w.close()
 
