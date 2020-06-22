@@ -2,29 +2,33 @@
 
 import multiprocessing as mp
 import sys
+import os
 
 
-def child(r,w,n):
-    print("Hijo ", n)
+def childWritter(w):
+    sys.stdin = open(0)
     while True:
-        if n == 1:
-            sys.stdin = open(0)
-            r.close() 
+        try:
             msg = input()
-            print("Hijo envia: "+msg)
             w.send(msg)
-        if n == 2:
-            w.close()
-            print("Hijo recibe: "+r.recv())
-    r.close()
-    w.close()
+        except EOFError:
+            print("Saliendo...")
+            break
 
+
+def childReader(r):
+    while True:
+        try:
+            msg = r.recv()        
+            print("Leyendo(pid:"+str(os.getpid())+"): "+msg)
+        except KeyboardInterrupt:
+            print("Interrumpido por el usuario")
+            break
 
 if __name__ == "__main__":
     r, w = mp.Pipe()
-    p1 = mp.Process(target=child, args=(r,w,1))
-    p2 = mp.Process(target=child, args=(r,w,2))
+    p1 = mp.Process(target=childWritter, args=(w,))
+    p2 = mp.Process(target=childReader, args=(r,))
     p1.start()
     p2.start()
     p1.join()
-    p2.join()
