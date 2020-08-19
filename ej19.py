@@ -8,12 +8,13 @@ import os
 
 
 def function(lock, ite, abecedario, n):
-    lock.acquire()
     fd = open(filename, 'a')
     letra = abecedario[n]
+    lock.acquire()
     for i in range(ite):
         fd.write(letra)
-    time.sleep(1)
+        fd.flush()
+        time.sleep(1)
     lock.release()
     fd.close()
 
@@ -38,12 +39,15 @@ for (opts, arg) in options:
 
 
 if __name__ == "__main__":
-    abecedario = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    abecedario = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     n = 0
     if os.path.isfile(filename):
         fd = open(filename, 'w')
     lock = mp.Lock()
     for i in range(num):
         mp.Process(target=function, args=(lock, ite, abecedario, n)).start()
-        n += 1 
+        if n >= 52:
+            n = 0
+        else: 
+            n += 1
     
