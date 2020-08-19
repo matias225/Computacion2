@@ -1,8 +1,24 @@
 #!/usr/bin/python3
 
+from multiprocessing import Process as p
 import socket
 import getopt
 import sys
+
+def child(clientsocket, addr, serversocket):
+    while True:
+        data = clientsocket.recv(1024)
+        print("Address: %s " % str(addr))
+        msg = data.decode("ascii")
+        print("Recibido: "+msg)
+        resp = msg[::-1]
+        print(resp)
+        clientsocket.send(resp.encode('ascii'))
+        if data.decode('ascii') == 'exit':
+            serversocket.close()
+            break
+
+
 
 
 def getOptions():
@@ -27,18 +43,9 @@ def createSocket(port):
     serversocket.bind((host, port))
     serversocket.listen(5)
     print('Server waiting for clients...')
-    clientsocket, addr = serversocket.accept()
     while True:
-            data = clientsocket.recv(1024)
-            print("Address: %s " % str(addr))
-            msg = data.decode("ascii")
-            print("Recibido: "+msg)
-            resp = msg[::-1]
-            print(resp)
-            clientsocket.send(resp.encode('ascii'))
-            if data.decode('ascii') == 'exit':
-                serversocket.close()
-                break
-
+        clientsocket, addr = serversocket.accept()
+        process = p(target=child, args=(clientsocket,addr,serversocket))
+        process.start()
 
 createSocket(port)
