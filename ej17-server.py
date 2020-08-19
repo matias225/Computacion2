@@ -12,13 +12,10 @@ def child(clientsocket, addr, serversocket):
         msg = data.decode("ascii")
         print("Recibido: "+msg)
         resp = msg[::-1]
-        print(resp)
         clientsocket.send(resp.encode('ascii'))
         if data.decode('ascii') == 'exit':
             serversocket.close()
             break
-
-
 
 
 def getOptions():
@@ -45,6 +42,7 @@ def createSocket(port):
     print('Server waiting for clients...')
     while True:
         clientsocket, addr = serversocket.accept()
+        print(str(addr))
         process = p(target=child, args=(clientsocket,addr,serversocket))
         process.start()
 
