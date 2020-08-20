@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
-import multiprocessing as mp
-import time
-import sys
-import getopt
-import os
+from multiprocessing import Process, Lock
+from time import sleep
+from sys import argv, exit
+from getopt import getopt, GetoptError
+from os import path
+from string import ascii_letters
 
 
 def function(lock, ite, abecedario, n):
@@ -14,17 +15,24 @@ def function(lock, ite, abecedario, n):
     for i in range(ite):
         fd.write(letra)
         fd.flush()
-        time.sleep(1)
+        sleep(1)
     lock.release()
     fd.close()
 
 
 def getOptions():
-    try:
-        (opts, arg) = getopt.getopt(sys.argv[1:], 'n:r:f:', [])
-        return opts
-    except getopt.GetoptError as error:
-        print('Wrong argument: '+str(error))
+    if len(argv[1:]) == 0:
+        print('No ha ingresado argumentos: por favor ingrese 3 argumentos (-f, -r y -n)')
+        exit()
+    if len(argv[1:]) == 6:
+        try:
+            (opts, arg) = getopt(argv[1:], 'n:r:f:', [])
+            return opts
+        except GetoptError as error:
+            print('Wrong option: '+str(error))
+            exit()
+    else:
+        print('Argumentos insuficientes: por favor ingrese 3 argumentos (-f, -r y -n)')
         exit()
 
 
@@ -39,13 +47,16 @@ for (opts, arg) in options:
 
 
 if __name__ == "__main__":
-    abecedario = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    abecedario = ascii_letters
+    if num > 52:
+        print('Numero de procesos muy alto, ingrese n menor a 52')
+        exit()
     n = 0
-    if os.path.isfile(filename):
+    if path.isfile(filename):
         fd = open(filename, 'w')
-    lock = mp.Lock()
+    lock = Lock()
     for i in range(num):
-        mp.Process(target=function, args=(lock, ite, abecedario, n)).start()
+        Process(target=function, args=(lock, ite, abecedario, n)).start()
         if n >= 52:
             n = 0
         else: 
