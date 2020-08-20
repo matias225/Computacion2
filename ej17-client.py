@@ -1,15 +1,15 @@
 #!/usr/bin/python3
 
-import socket
-import getopt
+from socket import socket, error, AF_INET, SOCK_STREAM
+from getopt import getopt, GetoptError
 from sys import argv, exit, stdin
 
 
 def getOptions():
     try:
-        (opts, arg) = getopt.getopt(argv[1:], 'p:h:', [])
+        (opts, arg) = getopt(argv[1:], 'p:h:', [])
         return opts
-    except getopt.GetoptError as error:
+    except GetoptError as error:
         print('Wrong Option: '+str(error))
         exit()
 
@@ -26,8 +26,8 @@ def createSocket(host, port):
     host = host
     port = port
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except socket.error:
+        s = socket(AF_INET, SOCK_STREAM)
+    except error:
         print("Failed to create socket")
         exit()
     s.connect((host, port))
@@ -44,4 +44,5 @@ def createSocket(host, port):
         except EOFError:
             break
 
-createSocket(host, port)
+if __name__ == "__main__":
+    createSocket(host, port)

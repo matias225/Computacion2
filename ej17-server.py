@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 
 from multiprocessing import Process as p
-import socket
-import getopt
-import sys
+from socket import socket, AF_INET, SOCK_STREAM
+from getopt import getopt, GetoptError
+from sys import argv
+
 
 def child(clientsocket, addr, serversocket):
     while True:
@@ -20,10 +21,10 @@ def child(clientsocket, addr, serversocket):
 
 def getOptions():
     try:
-        (opts, arg) = getopt.getopt(sys.argv[1:], 'p:', [])
+        (opts, arg) = getopt(argv[1:], 'p:', [])
         return opts
-    except getopt.GetoptError as error:
-        print('Wrong Option: '+str(error))
+    except GetoptError as error:
+        print('Wrong option: '+str(error))
         exit()
 
 
@@ -35,15 +36,16 @@ for (opts, arg) in options:
 
 def createSocket(port):
     port = port
-    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+    serversocket = socket(AF_INET, SOCK_STREAM) 
     host = ""
     serversocket.bind((host, port))
     serversocket.listen(5)
     print('Server waiting for clients...')
     while True:
         clientsocket, addr = serversocket.accept()
-        print(str(addr))
-        process = p(target=child, args=(clientsocket,addr,serversocket))
+        process = p(target=child, args=(clientsocket, addr, serversocket))
         process.start()
 
-createSocket(port)
+
+if __name__ == "__main__":
+    createSocket(port)
