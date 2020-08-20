@@ -38,7 +38,7 @@ def createSocket(port):
     port = port
     serversocket = socket(AF_INET, SOCK_STREAM) 
     host = ""
-    serversocket.bind(host, port)
+    serversocket.bind((host, port))
     serversocket.listen(5)
     print('Server waiting for clients...')
     while True:
