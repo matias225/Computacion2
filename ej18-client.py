@@ -1,16 +1,16 @@
 #!/usr/bin/python3
 
-import socket
-import getopt
-import sys
-import os
+from socket import socket, AF_INET, SOCK_STREAM, SOCK_DGRAM, error
+from getopt import getopt, GetoptError
+from sys import argv
+
 
 def getOptions():
     try:
-        (opts, arg) = getopt.getopt(sys.argv[1:], 'p:h:t:', [])
+        (opts, arg) = getopt(argv[1:], 'p:h:t:', [])
         return opts
-    except getopt.GetoptError as error:
-        print('Wrong argument: '+str(error))
+    except GetoptError as error:
+        print('Wrong option: '+str(error))
         exit()
 
 options = getOptions()
@@ -23,24 +23,43 @@ for (opts, arg) in options:
         protocol = arg
 
 
-def createSocket(host, port):
+def createSocketTCP(host, port):
     host = host
     port = port
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except socket.error:
+        s = socket(AF_INET, SOCK_STREAM)
+    except error:
         print("Failed to create socket")
         exit()
     s.connect((host, port))
-   # time = s.recv(1024).decode()
-    time = s.recv(1024)
+    time = s.recv(1024).decode('utf-8')
     try:
-        print("Time: ",time.decode())
-    except UnicodeDecodeError:
-        print("Error at decoding server response")
+        print("Fecha y hora actual (UTC): "+str(time))
+    except UnicodeDecodeError as error:
+        print(error)
+    
 
+def createSocketUDP(host, port):
+    host = host
+    port = port
+    try:
+        serversocket = socket(AF_INET, SOCK_DGRAM) 
+    except error:
+        print("Failed to create socket")
+        exit()
+    serversocket.sendto("".encode(), (host, port))
+    time = serversocket.recvfrom(1024).decode('utf-8')
+    try:
+        print("Fecha y hora actual (UTC): "+str(time))
+    except UnicodeDecodeError as error:
+        print(error)
+    
 
 if __name__ == "__main__":
     if protocol == 'tcp':
+        # Utilizar el puerto 13 y host time.nist.gov
         print('Protocolo TCP:')
-        createSocket(host, port)
+        createSocketTCP(host, port)
+    elif protocol == 'udp':
+        print('Protocolo UDP:')
+        createSocketUDP(host, port)
