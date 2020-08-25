@@ -1,13 +1,30 @@
 #!/usr/bin/python3
 
-from multiprocessing import Process as p, Lock as l
+from multiprocessing import Process as proc, Lock as l
 from getopt import getopt, GetoptError
 from sys import argv
 from socket import socket, AF_INET, SOCK_STREAM
 
 
 def client(clientSocket, addr, serverSocket):
-    pass
+    while True:
+        data = clientSocket.recv(1024)
+        print("Address: %s " % str(addr))
+        msg = data.decode("ascii")
+        print("Recibido: "+msg)
+        if msg == 'ABRIR':
+            print('Recibido abrir')
+        if msg == 'CERRAR':
+            print('Recibido cerrar')
+        if msg == 'AGREGAR':
+            print('Recibido agregar')
+        if msg == 'LEER':
+            print('Recibido leer')
+        #clientsocket.send(resp.encode('ascii'))
+        if data.decode('ascii') == 'exit':
+            serverSocket.close()
+            break
+
 
 def getOptions():
     if len(argv[1:]) == 0:
@@ -36,7 +53,7 @@ def createSocketTCP(port):
     print('Server waiting for clients...')
     while True:
         clientSocket, addr = serverSocket.accept()
-        p(target=client,args=(clientSocket,addr,serverSocket))
+        p = proc(target=client,args=(clientSocket,addr,serverSocket))
         p.start()
 
 
