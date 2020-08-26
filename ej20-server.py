@@ -10,17 +10,26 @@ def client(clientSocket, addr, serverSocket):
     while True:
         data = clientSocket.recv(1024)
         print("Address: %s " % str(addr))
-        msg = data.decode("ascii")
+        msg = data.decode('ascii')
         print("Recibido: "+msg)
         if msg == 'ABRIR':
-            print('Recibido abrir')
+            resp = 'Ingrese un nombre de archivo...'
+            clientSocket.send(resp.encode('ascii'))
+            clientresp = clientSocket.recv(1024)
+            filename = clientresp.decode('ascii')
+            fd = open(filename, 'r')
+            text = fd.readlines()
+            print(filename)
+            for i in text:
+                print(i)
+            #msg = 'Que desea hacer con el archivo?'
+            #clientSocket.send(msg.encode('ascii'))
         if msg == 'CERRAR':
             print('Recibido cerrar')
         if msg == 'AGREGAR':
             print('Recibido agregar')
         if msg == 'LEER':
             print('Recibido leer')
-        #clientsocket.send(resp.encode('ascii'))
         if data.decode('ascii') == 'exit':
             serverSocket.close()
             break

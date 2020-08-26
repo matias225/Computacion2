@@ -21,9 +21,9 @@ def createSocketTCP(host, port):
             if msg == 'exit':
                 clientSocket.close()
                 break
-            #msg = clientSocket.recv(2048)
-            #resp = msg.decode('ascii')
-            #print('--> '+resp)
+            msg = clientSocket.recv(2048)
+            resp = msg.decode('ascii')
+            print(resp)
         except EOFError:
             break
 
