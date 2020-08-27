@@ -6,7 +6,7 @@ from sys import argv, path
 from socket import socket, AF_INET, SOCK_STREAM
 
 
-def client(clientSocket, addr, serverSocket, l):
+def client(clientSocket, addr, serverSocket, l, fileisopen):
     while True:
         data = clientSocket.recv(1024)
         print("Address: %s " % str(addr))
@@ -24,13 +24,11 @@ def client(clientSocket, addr, serverSocket, l):
             clientSocket.send(msg.encode('ascii'))
         if fileisopen == 1:
             if msg == 'CERRAR':
-                l.acquire()
                 fd.close()
-                l.release()
                 msg = 'Archivo cerrado'
+                fileisopen = 0
                 clientSocket.send(msg.encode('ascii'))
             if msg == 'AGREGAR':
-                print('Recibido agregar')
                 resp = 'Ingrese el texto que desea agregar:'
                 clientSocket.send(resp.encode('ascii'))
                 clientresp = clientSocket.recv(1024)
@@ -41,16 +39,19 @@ def client(clientSocket, addr, serverSocket, l):
                 l.release()
                 msg = 'Desea hacer algo mas con el archivo?'
                 clientSocket.send(msg.encode('ascii'))
-            '''
             if msg == 'LEER':
                 fd = open(filename, 'r')
                 # Lista con las lineas leidas
                 lines = fd.readlines()    
-                fd.close()
-                # Junto todas las lineas en un solo mensaje
-                readedlines = ''.join(lines)
-                clientSocket.send(readedlines.encode('ascii'))
-            '''
+                print(len(lines))
+                if len(lines) == 0:
+                    clientSocket.send('El archivo esta vacio'.encode('ascii'))
+                    fd.close()
+                else:
+                    # Junto todas las lineas en un solo mensaje
+                    readedlines = ''.join(lines)
+                    clientSocket.send(readedlines.encode('ascii'))
+                    fd.close()
         else:
             clientSocket.send('Debe abrir un archivo primero...'.encode('ascii'))
         if msg == 'exit':
@@ -69,7 +70,6 @@ def getOptions():
         print('Wrong option: '+str(error))
         exit()
 
-
 options = getOptions()
 for (opts, arg) in options:
     if opts == '-p':
@@ -80,13 +80,14 @@ def createSocketTCP(port):
     port = port
     host = ""
     l = Lock()
+    fileisopen = 0
     serverSocket = socket(AF_INET, SOCK_STREAM)
     serverSocket.bind((host, port))
     serverSocket.listen(5)
     print('Server waiting for clients...')
     while True:
         clientSocket, addr = serverSocket.accept()
-        p = proc(target=client,args=(clientSocket,addr,serverSocket,l))
+        p = proc(target=client,args=(clientSocket, addr, serverSocket, l, fileisopen))
         p.start()
 
 
