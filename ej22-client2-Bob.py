@@ -46,7 +46,7 @@ def sendMsg(clientSocket):
         msg = input("Bob: ")
         if msg == 'cambio':
             clientSocket.send(msg.encode('ascii'))   
-            sleep(2)
+            sleep(1)
             break     
         if msg == 'exit':
             clientSocket.send(msg.encode('ascii'))        
@@ -69,7 +69,6 @@ def receiveMsg(clientSocket):
             exit()
         else:           
             print("Alice:", msg)
-
 
 
 if __name__ == "__main__":
