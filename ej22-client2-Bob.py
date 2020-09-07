@@ -61,7 +61,6 @@ def receiveMsg(clientSocket):
         data = clientSocket.recv(1024)
         msg = data.decode('ascii')
         if msg == 'cambio':
-            clientSocket.send(msg.encode('ascii'))    
             print("Alice:", msg)
             break
         if msg == 'exit':
