@@ -2,9 +2,9 @@
 
 from sys import argv, exit
 from getopt import getopt, GetoptError
-from multiprocessing import Process, Pipe, current_process
-from threading import Thread, current_thread
+from multiprocessing import Pool
 from time import sleep
+from os import getpid
 
 
 def getOptions():
@@ -31,42 +31,31 @@ def getArgs():
     return process, minP, maxP
 
 
-def show(a):
-    while True:
-        sleep(0.1)
-        data = a.recv()
-        if data == 404:
-            print('Thread '+str(current_process().name)+' exiting...')
-            break
-        print('Thread '+str(current_process().name)+' got '+str(data)+' from process.')
-        a.send('OK '+str(data)+' '+str(current_process().name))
-
-
 def split_list(alist, wanted_parts=1):
     length = len(alist)
     return [ alist[i*length // wanted_parts: (i+1)*length // wanted_parts] for i in range(wanted_parts) ]
 
 
-def parallelSquares(b, part):
-    print('Process '+str(current_thread().getName())+' archivieng list'+ str(part))
-    for i in part:
-        b.send(i*i)
-        print('Process '+str(current_thread().getName())+'got process message: '+str(b.recv()))
-        sleep(1)
-    b.send(404)
+def parallelSquares(part):
+    print('Pool worker with pid ', getpid())
+    return part**2
 
 
 def main():
     process, minP, maxP = getArgs()
+    pool = Pool()
     rang = list(range(minP, maxP))
     process_list = split_list(rang, process)
-    for part in process_list:
-        a, b = Pipe()
-        p = Process(target=parallelSquares, args=(b, part))
-        h = Thread(target=show, args=(a,))
-        p.start()
-        h.start()
 
+    print('Results with map:')
+    for part in process_list:
+        mapping = (pool.map(parallelSquares, part))
+        print('Resultados: ', mapping)
+
+    print('\nResults with apply:')
+    for part in process_list:
+        applying = [pool.apply(parallelSquares, args=(i,)) for i in part]
+        print('Resultados: ', applying)
 
 
 if __name__ == "__main__":
